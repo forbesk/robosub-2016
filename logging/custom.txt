@@ -1,0 +1,9 @@
+set daemon 5
+
+set httpd port 2812 and
+  use address localhost
+  allow localhost
+
+check process logserv with pidfile "/var/run/logserv.pid"
+  start program = "/sbin/start logserv"
+  stop program = "/sbin/stop logserv"

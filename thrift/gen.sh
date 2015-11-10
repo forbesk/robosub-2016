@@ -11,7 +11,7 @@ rm -rf ./gen-*
 
 #generate for all files & languages
 echo ""
-for lang in py java js:node; do
+for lang in py java js:node js; do
     for file in *.thrift; do
         echo "Generating thrift $lang files for $file"
         thrift -r --gen $lang $file
@@ -33,6 +33,10 @@ cp -r ./gen-nodejs/* ../logging/logservice
 echo "Copying generated files to ../remote/services/"
 rm -rf ../remote/services/*
 cp -r ./gen-nodejs/* ../remote/services/
+
+echo "Copying generated files to ../remote/public/services/"
+rm -rf ../remote/public/services/*
+cp -r ./gen-js/* ../remote/public/services/
 
 echo ""
 echo "Done."

@@ -3,4 +3,25 @@ extends layout
 block content
   include navbar.jade
   .container
-    h4 Logs 
+    h4 Logs
+    .row
+      .col-md-9
+        p something goes here, probably a chart or something
+      .col-md-3
+        .panel.panel-default
+          .panel-heading
+            h4.panel-title Log Directory
+          .panel-body
+            .input-group
+              input#logdir.form-control(type=text, placeholder=text)
+              span.input-group-btn
+                button.btn.btn-info(type=button) Update
+        .panel.panel-default
+          .panel-heading
+            h4.panel-title Available Logs
+          .panel-body
+            select#loglist.form-control(multiple)
+              option Log1.log
+              option Log2.log
+              option Log3.log
+            button.btn.btn-info.btn-sm.btn-block(type=button) Load
