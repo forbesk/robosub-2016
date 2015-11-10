@@ -9,6 +9,7 @@
   "author": "auvua",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.7.1",
     "debug": "^2.2.0",
     "mocha": "^2.3.3",
     "thrift": "^0.9.3",

@@ -1,5 +1,6 @@
 var debug = require("debug")("app");
 var fs = require("fs");
+var cors = require('cors');
 var thrift = require("thrift");
 var Logger = require("./logservice/LogService");
 var ttypes = require("./logservice/LogService_types");
@@ -112,3 +113,21 @@ var server = thrift.createServer(Logger, LoggerHandler).on('error', function(err
 
 console.log("Starting server");
 server.listen(5001);
+
+thrift.createWebServer({
+  files: ".",
+  useCors: true,
+  cors: {
+    "*": cors({
+      origin: "localhost:3000"
+    })
+  },
+  services: {
+    "/logserv": {
+      transport: thrift.TBufferedTransport,
+      protocol: thrift.TJSONProtocol,
+      processor: Logger,
+      handler: LoggerHandler
+    }
+  }
+}).listen(3001);
