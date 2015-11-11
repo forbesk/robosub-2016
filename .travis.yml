@@ -55,5 +55,6 @@ before_script:
     - sh thrift/gen.sh
 script:
     #add test scripts here
+    - cd logging
     - node index.js &
     - npm test
