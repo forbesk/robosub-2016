@@ -7,7 +7,7 @@ var ttypes = require('./logservice/LogService_types');
 
 var msg = {
   'time': Date.now(),
-  'Test message': "does it work?",
+  'Test message': "does it work?\n\ttest",
   'I think': 42,
   'it does': 3.14159,
   'x': 0
@@ -22,16 +22,9 @@ connection.on('error', function(err) {
 });
 
 describe('Logging to new file', function() {
-  it('don\'t set the log directory to "/should/not/exist"', function(done) {
-    client.setLogDirectory('/should/not/exist', function(err, response) {
-      test.assert(response === false);
-      done();
-    });
-  });
-
-  it('set the log directory to ' + __dirname, function(done) {
-    client.setLogDirectory(__dirname, function(err, response) {
-      test.assert(response === true);
+  it('get the log directory', function(done) {
+    client.getLogDirectory(function(err, response) {
+      test.assert(response !== '');
       done();
     });
   });
@@ -73,6 +66,14 @@ describe('Logging to new file', function() {
       test.assert(rxmsg === textmsg);
       done();
     }, 5);
+  });
+
+  it('returns correct file contents', function(done) {
+    client.getLogFile('test.txt', function(err, response) {
+      var result = JSON.parse(response.join('\n'))['message'];
+      test.assert(JSON.stringify(result) === JSON.stringify(msg));
+      done();
+    });
   });
 
   it('stop logging if currently logging', function(done) {
