@@ -39,7 +39,7 @@ install:
     #install logging service dependencies
     - cd logging
     - npm install
-    - cp ..
+    - cd ..
     #install opencv 2.4
     # - git clone https://github.com/Itseez/opencv.git
     # - cd opencv
