@@ -1,27 +1,26 @@
 extends layout
 
+block postscripts
+  script(src='/javascripts/logs.js')
+
 block content
   include navbar.jade
   .container
     h4 Logs
     .row
       .col-md-9
-        p something goes here, probably a chart or something
       .col-md-3
-        .panel.panel-default
-          .panel-heading
-            h4.panel-title Log Directory
-          .panel-body
-            .input-group
-              input#logdir.form-control(type=text, placeholder=text)
-              span.input-group-btn
-                button.btn.btn-info(type=button) Update
+        p Service Status:&nbsp;&nbsp;
+          span#logservstatus.label.label-default Connecting...
         .panel.panel-default
           .panel-heading
             h4.panel-title Available Logs
+              span
+                button.btn.btn-info.btn-xs(type=button, onclick='logserv.refresh()', style='float: right;') refresh
           .panel-body
-            select#loglist.form-control(multiple)
-              option Log1.log
-              option Log2.log
-              option Log3.log
-            button.btn.btn-info.btn-sm.btn-block(type=button) Load
+            select#loglist.form-control.input-sm
+            button.btn.btn-info.btn-xs.btn-block(type=button, onclick='logserv.getLogFile()') Load
+    .row
+      .col-md-12
+        div(style='overflow-y: scroll;')
+          pre#logcontents(style='font-size: 8pt; height: 200px;') Log data to appear here
