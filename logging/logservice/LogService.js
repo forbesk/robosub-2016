@@ -11,18 +11,10 @@ var Q = thrift.Q;
 var ttypes = require('./LogService_types');
 //HELPER FUNCTIONS AND STRUCTURES
 
-LogService_setLogDirectory_args = function(args) {
-  this.path = null;
-  if (args) {
-    if (args.path !== undefined && args.path !== null) {
-      this.path = args.path;
-    } else {
-      throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field path is unset!');
-    }
-  }
+LogService_getLogDirectory_args = function(args) {
 };
-LogService_setLogDirectory_args.prototype = {};
-LogService_setLogDirectory_args.prototype.read = function(input) {
+LogService_getLogDirectory_args.prototype = {};
+LogService_getLogDirectory_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -33,40 +25,21 @@ LogService_setLogDirectory_args.prototype.read = function(input) {
     if (ftype == Thrift.Type.STOP) {
       break;
     }
-    switch (fid)
-    {
-      case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.path = input.readString();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 0:
-        input.skip(ftype);
-        break;
-      default:
-        input.skip(ftype);
-    }
+    input.skip(ftype);
     input.readFieldEnd();
   }
   input.readStructEnd();
   return;
 };
 
-LogService_setLogDirectory_args.prototype.write = function(output) {
-  output.writeStructBegin('LogService_setLogDirectory_args');
-  if (this.path !== null && this.path !== undefined) {
-    output.writeFieldBegin('path', Thrift.Type.STRING, 1);
-    output.writeString(this.path);
-    output.writeFieldEnd();
-  }
+LogService_getLogDirectory_args.prototype.write = function(output) {
+  output.writeStructBegin('LogService_getLogDirectory_args');
   output.writeFieldStop();
   output.writeStructEnd();
   return;
 };
 
-LogService_setLogDirectory_result = function(args) {
+LogService_getLogDirectory_result = function(args) {
   this.success = null;
   if (args) {
     if (args.success !== undefined && args.success !== null) {
@@ -74,8 +47,8 @@ LogService_setLogDirectory_result = function(args) {
     }
   }
 };
-LogService_setLogDirectory_result.prototype = {};
-LogService_setLogDirectory_result.prototype.read = function(input) {
+LogService_getLogDirectory_result.prototype = {};
+LogService_getLogDirectory_result.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -89,8 +62,8 @@ LogService_setLogDirectory_result.prototype.read = function(input) {
     switch (fid)
     {
       case 0:
-      if (ftype == Thrift.Type.BOOL) {
-        this.success = input.readBool();
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -107,11 +80,11 @@ LogService_setLogDirectory_result.prototype.read = function(input) {
   return;
 };
 
-LogService_setLogDirectory_result.prototype.write = function(output) {
-  output.writeStructBegin('LogService_setLogDirectory_result');
+LogService_getLogDirectory_result.prototype.write = function(output) {
+  output.writeStructBegin('LogService_getLogDirectory_result');
   if (this.success !== null && this.success !== undefined) {
-    output.writeFieldBegin('success', Thrift.Type.BOOL, 0);
-    output.writeBool(this.success);
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -279,17 +252,9 @@ LogService_getLogFile_args.prototype.write = function(output) {
 
 LogService_getLogFile_result = function(args) {
   this.success = null;
-  this.err = null;
-  if (args instanceof ttypes.FileNotFound) {
-    this.err = args;
-    return;
-  }
   if (args) {
     if (args.success !== undefined && args.success !== null) {
-      this.success = args.success;
-    }
-    if (args.err !== undefined && args.err !== null) {
-      this.err = args.err;
+      this.success = Thrift.copyList(args.success, [null]);
     }
   }
 };
@@ -308,20 +273,28 @@ LogService_getLogFile_result.prototype.read = function(input) {
     switch (fid)
     {
       case 0:
-      if (ftype == Thrift.Type.STRING) {
-        this.success = input.readString();
+      if (ftype == Thrift.Type.LIST) {
+        var _size8 = 0;
+        var _rtmp312;
+        this.success = [];
+        var _etype11 = 0;
+        _rtmp312 = input.readListBegin();
+        _etype11 = _rtmp312.etype;
+        _size8 = _rtmp312.size;
+        for (var _i13 = 0; _i13 < _size8; ++_i13)
+        {
+          var elem14 = null;
+          elem14 = input.readString();
+          this.success.push(elem14);
+        }
+        input.readListEnd();
       } else {
         input.skip(ftype);
       }
       break;
-      case 1:
-      if (ftype == Thrift.Type.STRUCT) {
-        this.err = new ttypes.FileNotFound();
-        this.err.read(input);
-      } else {
+      case 0:
         input.skip(ftype);
-      }
-      break;
+        break;
       default:
         input.skip(ftype);
     }
@@ -334,13 +307,17 @@ LogService_getLogFile_result.prototype.read = function(input) {
 LogService_getLogFile_result.prototype.write = function(output) {
   output.writeStructBegin('LogService_getLogFile_result');
   if (this.success !== null && this.success !== undefined) {
-    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
-    output.writeString(this.success);
-    output.writeFieldEnd();
-  }
-  if (this.err !== null && this.err !== undefined) {
-    output.writeFieldBegin('err', Thrift.Type.STRUCT, 1);
-    this.err.write(output);
+    output.writeFieldBegin('success', Thrift.Type.LIST, 0);
+    output.writeListBegin(Thrift.Type.STRING, this.success.length);
+    for (var iter15 in this.success)
+    {
+      if (this.success.hasOwnProperty(iter15))
+      {
+        iter15 = this.success[iter15];
+        output.writeString(iter15);
+      }
+    }
+    output.writeListEnd();
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -725,7 +702,7 @@ LogServiceClient = exports.Client = function(output, pClass) {
 LogServiceClient.prototype = {};
 LogServiceClient.prototype.seqid = function() { return this._seqid; }
 LogServiceClient.prototype.new_seqid = function() { return this._seqid += 1; }
-LogServiceClient.prototype.setLogDirectory = function(path, callback) {
+LogServiceClient.prototype.getLogDirectory = function(callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -736,25 +713,24 @@ LogServiceClient.prototype.setLogDirectory = function(path, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_setLogDirectory(path);
+    this.send_getLogDirectory();
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_setLogDirectory(path);
+    this.send_getLogDirectory();
   }
 };
 
-LogServiceClient.prototype.send_setLogDirectory = function(path) {
+LogServiceClient.prototype.send_getLogDirectory = function() {
   var output = new this.pClass(this.output);
-  output.writeMessageBegin('setLogDirectory', Thrift.MessageType.CALL, this.seqid());
-  var args = new LogService_setLogDirectory_args();
-  args.path = path;
+  output.writeMessageBegin('getLogDirectory', Thrift.MessageType.CALL, this.seqid());
+  var args = new LogService_getLogDirectory_args();
   args.write(output);
   output.writeMessageEnd();
   return this.output.flush();
 };
 
-LogServiceClient.prototype.recv_setLogDirectory = function(input,mtype,rseqid) {
+LogServiceClient.prototype.recv_getLogDirectory = function(input,mtype,rseqid) {
   var callback = this._reqs[rseqid] || function() {};
   delete this._reqs[rseqid];
   if (mtype == Thrift.MessageType.EXCEPTION) {
@@ -763,14 +739,14 @@ LogServiceClient.prototype.recv_setLogDirectory = function(input,mtype,rseqid) {
     input.readMessageEnd();
     return callback(x);
   }
-  var result = new LogService_setLogDirectory_result();
+  var result = new LogService_getLogDirectory_result();
   result.read(input);
   input.readMessageEnd();
 
   if (null !== result.success) {
     return callback(null, result.success);
   }
-  return callback('setLogDirectory failed: unknown result');
+  return callback('getLogDirectory failed: unknown result');
 };
 LogServiceClient.prototype.getLogFileList = function(callback) {
   this._seqid = this.new_seqid();
@@ -860,9 +836,6 @@ LogServiceClient.prototype.recv_getLogFile = function(input,mtype,rseqid) {
   result.read(input);
   input.readMessageEnd();
 
-  if (null !== result.err) {
-    return callback(result.err);
-  }
   if (null !== result.success) {
     return callback(null, result.success);
   }
@@ -1028,13 +1001,29 @@ LogServiceClient.prototype.log = function(level, message, callback) {
 
 LogServiceClient.prototype.send_log = function(level, message) {
   var output = new this.pClass(this.output);
-  output.writeMessageBegin('log', Thrift.MessageType.ONEWAY, this.seqid());
+  output.writeMessageBegin('log', Thrift.MessageType.CALL, this.seqid());
   var args = new LogService_log_args();
   args.level = level;
   args.message = message;
   args.write(output);
   output.writeMessageEnd();
   return this.output.flush();
+};
+
+LogServiceClient.prototype.recv_log = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new LogService_log_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  callback(null)
 };
 LogServiceProcessor = exports.Processor = function(handler) {
   this._handler = handler
@@ -1054,33 +1043,33 @@ LogServiceProcessor.prototype.process = function(input, output) {
   }
 }
 
-LogServiceProcessor.prototype.process_setLogDirectory = function(seqid, input, output) {
-  var args = new LogService_setLogDirectory_args();
+LogServiceProcessor.prototype.process_getLogDirectory = function(seqid, input, output) {
+  var args = new LogService_getLogDirectory_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.setLogDirectory.length === 1) {
-    Q.fcall(this._handler.setLogDirectory, args.path)
+  if (this._handler.getLogDirectory.length === 0) {
+    Q.fcall(this._handler.getLogDirectory)
       .then(function(result) {
-        var result = new LogService_setLogDirectory_result({success: result});
-        output.writeMessageBegin("setLogDirectory", Thrift.MessageType.REPLY, seqid);
+        var result = new LogService_getLogDirectory_result({success: result});
+        output.writeMessageBegin("getLogDirectory", Thrift.MessageType.REPLY, seqid);
         result.write(output);
         output.writeMessageEnd();
         output.flush();
       }, function (err) {
         var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("setLogDirectory", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("getLogDirectory", Thrift.MessageType.EXCEPTION, seqid);
         result.write(output);
         output.writeMessageEnd();
         output.flush();
       });
   } else {
-    this._handler.setLogDirectory(args.path, function (err, result) {
+    this._handler.getLogDirectory(function (err, result) {
       if (err == null) {
-        var result = new LogService_setLogDirectory_result((err != null ? err : {success: result}));
-        output.writeMessageBegin("setLogDirectory", Thrift.MessageType.REPLY, seqid);
+        var result = new LogService_getLogDirectory_result((err != null ? err : {success: result}));
+        output.writeMessageBegin("getLogDirectory", Thrift.MessageType.REPLY, seqid);
       } else {
         var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("setLogDirectory", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("getLogDirectory", Thrift.MessageType.EXCEPTION, seqid);
       }
       result.write(output);
       output.writeMessageEnd();
@@ -1137,20 +1126,15 @@ LogServiceProcessor.prototype.process_getLogFile = function(seqid, input, output
         output.writeMessageEnd();
         output.flush();
       }, function (err) {
-        if (err instanceof ttypes.FileNotFound) {
-          var result = new LogService_getLogFile_result(err);
-          output.writeMessageBegin("getLogFile", Thrift.MessageType.REPLY, seqid);
-        } else {
-          var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-          output.writeMessageBegin("getLogFile", Thrift.MessageType.EXCEPTION, seqid);
-        }
+        var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("getLogFile", Thrift.MessageType.EXCEPTION, seqid);
         result.write(output);
         output.writeMessageEnd();
         output.flush();
       });
   } else {
     this._handler.getLogFile(args.filename, function (err, result) {
-      if (err == null || err instanceof ttypes.FileNotFound) {
+      if (err == null) {
         var result = new LogService_getLogFile_result((err != null ? err : {success: result}));
         output.writeMessageBegin("getLogFile", Thrift.MessageType.REPLY, seqid);
       } else {
@@ -1273,6 +1257,34 @@ LogServiceProcessor.prototype.process_log = function(seqid, input, output) {
   var args = new LogService_log_args();
   args.read(input);
   input.readMessageEnd();
-  this._handler.log(args.level, args.message)
+  if (this._handler.log.length === 2) {
+    Q.fcall(this._handler.log, args.level, args.message)
+      .then(function(result) {
+        var result = new LogService_log_result({success: result});
+        output.writeMessageBegin("log", Thrift.MessageType.REPLY, seqid);
+        result.write(output);
+        output.writeMessageEnd();
+        output.flush();
+      }, function (err) {
+        var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("log", Thrift.MessageType.EXCEPTION, seqid);
+        result.write(output);
+        output.writeMessageEnd();
+        output.flush();
+      });
+  } else {
+    this._handler.log(args.level, args.message, function (err, result) {
+      if (err == null) {
+        var result = new LogService_log_result((err != null ? err : {success: result}));
+        output.writeMessageBegin("log", Thrift.MessageType.REPLY, seqid);
+      } else {
+        var result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("log", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  }
 }
 

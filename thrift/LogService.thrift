@@ -33,11 +33,11 @@ exception FileNotFound { }
  * Services
  */
 service LogService {
-    bool setLogDirectory(1: required string path)
+    string getLogDirectory()
     list<string> getLogFileList()
-    string getLogFile(1: required string filename) throws (1: FileNotFound err)
+    list<string> getLogFile(1: required string filename)// throws (1: FileNotFound err)
     bool startLogging(1: required string filename)
     bool isLogging()
     bool stopLogging()
-    oneway void log(1: required Level level, 2: required string message)
+    void log(1: required Level level, 2: required string message)
 }

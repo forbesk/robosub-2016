@@ -7,18 +7,10 @@
 
 //HELPER FUNCTIONS AND STRUCTURES
 
-LogService_setLogDirectory_args = function(args) {
-  this.path = null;
-  if (args) {
-    if (args.path !== undefined && args.path !== null) {
-      this.path = args.path;
-    } else {
-      throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field path is unset!');
-    }
-  }
+LogService_getLogDirectory_args = function(args) {
 };
-LogService_setLogDirectory_args.prototype = {};
-LogService_setLogDirectory_args.prototype.read = function(input) {
+LogService_getLogDirectory_args.prototype = {};
+LogService_getLogDirectory_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -29,40 +21,21 @@ LogService_setLogDirectory_args.prototype.read = function(input) {
     if (ftype == Thrift.Type.STOP) {
       break;
     }
-    switch (fid)
-    {
-      case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.path = input.readString().value;
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 0:
-        input.skip(ftype);
-        break;
-      default:
-        input.skip(ftype);
-    }
+    input.skip(ftype);
     input.readFieldEnd();
   }
   input.readStructEnd();
   return;
 };
 
-LogService_setLogDirectory_args.prototype.write = function(output) {
-  output.writeStructBegin('LogService_setLogDirectory_args');
-  if (this.path !== null && this.path !== undefined) {
-    output.writeFieldBegin('path', Thrift.Type.STRING, 1);
-    output.writeString(this.path);
-    output.writeFieldEnd();
-  }
+LogService_getLogDirectory_args.prototype.write = function(output) {
+  output.writeStructBegin('LogService_getLogDirectory_args');
   output.writeFieldStop();
   output.writeStructEnd();
   return;
 };
 
-LogService_setLogDirectory_result = function(args) {
+LogService_getLogDirectory_result = function(args) {
   this.success = null;
   if (args) {
     if (args.success !== undefined && args.success !== null) {
@@ -70,8 +43,8 @@ LogService_setLogDirectory_result = function(args) {
     }
   }
 };
-LogService_setLogDirectory_result.prototype = {};
-LogService_setLogDirectory_result.prototype.read = function(input) {
+LogService_getLogDirectory_result.prototype = {};
+LogService_getLogDirectory_result.prototype.read = function(input) {
   input.readStructBegin();
   while (true)
   {
@@ -85,8 +58,8 @@ LogService_setLogDirectory_result.prototype.read = function(input) {
     switch (fid)
     {
       case 0:
-      if (ftype == Thrift.Type.BOOL) {
-        this.success = input.readBool().value;
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString().value;
       } else {
         input.skip(ftype);
       }
@@ -103,11 +76,11 @@ LogService_setLogDirectory_result.prototype.read = function(input) {
   return;
 };
 
-LogService_setLogDirectory_result.prototype.write = function(output) {
-  output.writeStructBegin('LogService_setLogDirectory_result');
+LogService_getLogDirectory_result.prototype.write = function(output) {
+  output.writeStructBegin('LogService_getLogDirectory_result');
   if (this.success !== null && this.success !== undefined) {
-    output.writeFieldBegin('success', Thrift.Type.BOOL, 0);
-    output.writeBool(this.success);
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -275,17 +248,9 @@ LogService_getLogFile_args.prototype.write = function(output) {
 
 LogService_getLogFile_result = function(args) {
   this.success = null;
-  this.err = null;
-  if (args instanceof FileNotFound) {
-    this.err = args;
-    return;
-  }
   if (args) {
     if (args.success !== undefined && args.success !== null) {
-      this.success = args.success;
-    }
-    if (args.err !== undefined && args.err !== null) {
-      this.err = args.err;
+      this.success = Thrift.copyList(args.success, [null]);
     }
   }
 };
@@ -304,20 +269,28 @@ LogService_getLogFile_result.prototype.read = function(input) {
     switch (fid)
     {
       case 0:
-      if (ftype == Thrift.Type.STRING) {
-        this.success = input.readString().value;
+      if (ftype == Thrift.Type.LIST) {
+        var _size8 = 0;
+        var _rtmp312;
+        this.success = [];
+        var _etype11 = 0;
+        _rtmp312 = input.readListBegin();
+        _etype11 = _rtmp312.etype;
+        _size8 = _rtmp312.size;
+        for (var _i13 = 0; _i13 < _size8; ++_i13)
+        {
+          var elem14 = null;
+          elem14 = input.readString().value;
+          this.success.push(elem14);
+        }
+        input.readListEnd();
       } else {
         input.skip(ftype);
       }
       break;
-      case 1:
-      if (ftype == Thrift.Type.STRUCT) {
-        this.err = new FileNotFound();
-        this.err.read(input);
-      } else {
+      case 0:
         input.skip(ftype);
-      }
-      break;
+        break;
       default:
         input.skip(ftype);
     }
@@ -330,13 +303,17 @@ LogService_getLogFile_result.prototype.read = function(input) {
 LogService_getLogFile_result.prototype.write = function(output) {
   output.writeStructBegin('LogService_getLogFile_result');
   if (this.success !== null && this.success !== undefined) {
-    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
-    output.writeString(this.success);
-    output.writeFieldEnd();
-  }
-  if (this.err !== null && this.err !== undefined) {
-    output.writeFieldBegin('err', Thrift.Type.STRUCT, 1);
-    this.err.write(output);
+    output.writeFieldBegin('success', Thrift.Type.LIST, 0);
+    output.writeListBegin(Thrift.Type.STRING, this.success.length);
+    for (var iter15 in this.success)
+    {
+      if (this.success.hasOwnProperty(iter15))
+      {
+        iter15 = this.success[iter15];
+        output.writeString(iter15);
+      }
+    }
+    output.writeListEnd();
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -718,17 +695,16 @@ LogServiceClient = function(input, output) {
     this.seqid = 0;
 };
 LogServiceClient.prototype = {};
-LogServiceClient.prototype.setLogDirectory = function(path, callback) {
-  this.send_setLogDirectory(path, callback); 
+LogServiceClient.prototype.getLogDirectory = function(callback) {
+  this.send_getLogDirectory(callback); 
   if (!callback) {
-    return this.recv_setLogDirectory();
+    return this.recv_getLogDirectory();
   }
 };
 
-LogServiceClient.prototype.send_setLogDirectory = function(path, callback) {
-  this.output.writeMessageBegin('setLogDirectory', Thrift.MessageType.CALL, this.seqid);
-  var args = new LogService_setLogDirectory_args();
-  args.path = path;
+LogServiceClient.prototype.send_getLogDirectory = function(callback) {
+  this.output.writeMessageBegin('getLogDirectory', Thrift.MessageType.CALL, this.seqid);
+  var args = new LogService_getLogDirectory_args();
   args.write(this.output);
   this.output.writeMessageEnd();
   if (callback) {
@@ -736,7 +712,7 @@ LogServiceClient.prototype.send_setLogDirectory = function(path, callback) {
     this.output.getTransport().flush(true, function() {
       var result = null;
       try {
-        result = self.recv_setLogDirectory();
+        result = self.recv_getLogDirectory();
       } catch (e) {
         result = e;
       }
@@ -747,7 +723,7 @@ LogServiceClient.prototype.send_setLogDirectory = function(path, callback) {
   }
 };
 
-LogServiceClient.prototype.recv_setLogDirectory = function() {
+LogServiceClient.prototype.recv_getLogDirectory = function() {
   var ret = this.input.readMessageBegin();
   var fname = ret.fname;
   var mtype = ret.mtype;
@@ -758,14 +734,14 @@ LogServiceClient.prototype.recv_setLogDirectory = function() {
     this.input.readMessageEnd();
     throw x;
   }
-  var result = new LogService_setLogDirectory_result();
+  var result = new LogService_getLogDirectory_result();
   result.read(this.input);
   this.input.readMessageEnd();
 
   if (null !== result.success) {
     return result.success;
   }
-  throw 'setLogDirectory failed: unknown result';
+  throw 'getLogDirectory failed: unknown result';
 };
 LogServiceClient.prototype.getLogFileList = function(callback) {
   this.send_getLogFileList(callback); 
@@ -859,9 +835,6 @@ LogServiceClient.prototype.recv_getLogFile = function() {
   result.read(this.input);
   this.input.readMessageEnd();
 
-  if (null !== result.err) {
-    throw result.err;
-  }
   if (null !== result.success) {
     return result.success;
   }
@@ -1014,10 +987,13 @@ LogServiceClient.prototype.recv_stopLogging = function() {
 };
 LogServiceClient.prototype.log = function(level, message, callback) {
   this.send_log(level, message, callback); 
+  if (!callback) {
+  this.recv_log();
+  }
 };
 
 LogServiceClient.prototype.send_log = function(level, message, callback) {
-  this.output.writeMessageBegin('log', Thrift.MessageType.ONEWAY, this.seqid);
+  this.output.writeMessageBegin('log', Thrift.MessageType.CALL, this.seqid);
   var args = new LogService_log_args();
   args.level = level;
   args.message = message;
@@ -1037,4 +1013,22 @@ LogServiceClient.prototype.send_log = function(level, message, callback) {
   } else {
     return this.output.getTransport().flush();
   }
+};
+
+LogServiceClient.prototype.recv_log = function() {
+  var ret = this.input.readMessageBegin();
+  var fname = ret.fname;
+  var mtype = ret.mtype;
+  var rseqid = ret.rseqid;
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(this.input);
+    this.input.readMessageEnd();
+    throw x;
+  }
+  var result = new LogService_log_result();
+  result.read(this.input);
+  this.input.readMessageEnd();
+
+  return;
 };

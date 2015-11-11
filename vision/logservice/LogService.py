@@ -22,11 +22,7 @@ class Iface:
   """
   Services
   """
-  def setLogDirectory(self, path):
-    """
-    Parameters:
-     - path
-    """
+  def getLogDirectory(self):
     pass
 
   def getLogFileList(self):
@@ -71,23 +67,18 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
-  def setLogDirectory(self, path):
-    """
-    Parameters:
-     - path
-    """
-    self.send_setLogDirectory(path)
-    return self.recv_setLogDirectory()
+  def getLogDirectory(self):
+    self.send_getLogDirectory()
+    return self.recv_getLogDirectory()
 
-  def send_setLogDirectory(self, path):
-    self._oprot.writeMessageBegin('setLogDirectory', TMessageType.CALL, self._seqid)
-    args = setLogDirectory_args()
-    args.path = path
+  def send_getLogDirectory(self):
+    self._oprot.writeMessageBegin('getLogDirectory', TMessageType.CALL, self._seqid)
+    args = getLogDirectory_args()
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
 
-  def recv_setLogDirectory(self):
+  def recv_getLogDirectory(self):
     iprot = self._iprot
     (fname, mtype, rseqid) = iprot.readMessageBegin()
     if mtype == TMessageType.EXCEPTION:
@@ -95,12 +86,12 @@ class Client(Iface):
       x.read(iprot)
       iprot.readMessageEnd()
       raise x
-    result = setLogDirectory_result()
+    result = getLogDirectory_result()
     result.read(iprot)
     iprot.readMessageEnd()
     if result.success is not None:
       return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "setLogDirectory failed: unknown result")
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "getLogDirectory failed: unknown result")
 
   def getLogFileList(self):
     self.send_getLogFileList()
@@ -157,8 +148,6 @@ class Client(Iface):
     iprot.readMessageEnd()
     if result.success is not None:
       return result.success
-    if result.err is not None:
-      raise result.err
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getLogFile failed: unknown result")
 
   def startLogging(self, filename):
@@ -251,9 +240,10 @@ class Client(Iface):
      - message
     """
     self.send_log(level, message)
+    self.recv_log()
 
   def send_log(self, level, message):
-    self._oprot.writeMessageBegin('log', TMessageType.ONEWAY, self._seqid)
+    self._oprot.writeMessageBegin('log', TMessageType.CALL, self._seqid)
     args = log_args()
     args.level = level
     args.message = message
@@ -261,11 +251,25 @@ class Client(Iface):
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
 
+  def recv_log(self):
+    iprot = self._iprot
+    (fname, mtype, rseqid) = iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(iprot)
+      iprot.readMessageEnd()
+      raise x
+    result = log_result()
+    result.read(iprot)
+    iprot.readMessageEnd()
+    return
+
+
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
     self._processMap = {}
-    self._processMap["setLogDirectory"] = Processor.process_setLogDirectory
+    self._processMap["getLogDirectory"] = Processor.process_getLogDirectory
     self._processMap["getLogFileList"] = Processor.process_getLogFileList
     self._processMap["getLogFile"] = Processor.process_getLogFile
     self._processMap["startLogging"] = Processor.process_startLogging
@@ -288,13 +292,13 @@ class Processor(Iface, TProcessor):
       self._processMap[name](self, seqid, iprot, oprot)
     return True
 
-  def process_setLogDirectory(self, seqid, iprot, oprot):
-    args = setLogDirectory_args()
+  def process_getLogDirectory(self, seqid, iprot, oprot):
+    args = getLogDirectory_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    result = setLogDirectory_result()
+    result = getLogDirectory_result()
     try:
-      result.success = self._handler.setLogDirectory(args.path)
+      result.success = self._handler.getLogDirectory()
       msg_type = TMessageType.REPLY
     except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
       raise
@@ -302,7 +306,7 @@ class Processor(Iface, TProcessor):
       msg_type = TMessageType.EXCEPTION
       logging.exception(ex)
       result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-    oprot.writeMessageBegin("setLogDirectory", msg_type, seqid)
+    oprot.writeMessageBegin("getLogDirectory", msg_type, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -336,9 +340,6 @@ class Processor(Iface, TProcessor):
       msg_type = TMessageType.REPLY
     except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
       raise
-    except FileNotFound as err:
-      msg_type = TMessageType.REPLY
-      result.err = err
     except Exception as ex:
       msg_type = TMessageType.EXCEPTION
       logging.exception(ex)
@@ -409,30 +410,28 @@ class Processor(Iface, TProcessor):
     args = log_args()
     args.read(iprot)
     iprot.readMessageEnd()
+    result = log_result()
     try:
       self._handler.log(args.level, args.message)
       msg_type = TMessageType.REPLY
     except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
       raise
-    except:
-      pass
+    except Exception as ex:
+      msg_type = TMessageType.EXCEPTION
+      logging.exception(ex)
+      result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+    oprot.writeMessageBegin("log", msg_type, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
 
 
 # HELPER FUNCTIONS AND STRUCTURES
 
-class setLogDirectory_args:
-  """
-  Attributes:
-   - path
-  """
+class getLogDirectory_args:
 
   thrift_spec = (
-    None, # 0
-    (1, TType.STRING, 'path', None, None, ), # 1
   )
-
-  def __init__(self, path=None,):
-    self.path = path
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -443,11 +442,6 @@ class setLogDirectory_args:
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.path = iprot.readString()
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -457,23 +451,16 @@ class setLogDirectory_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('setLogDirectory_args')
-    if self.path is not None:
-      oprot.writeFieldBegin('path', TType.STRING, 1)
-      oprot.writeString(self.path)
-      oprot.writeFieldEnd()
+    oprot.writeStructBegin('getLogDirectory_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
   def validate(self):
-    if self.path is None:
-      raise TProtocol.TProtocolException(message='Required field path is unset!')
     return
 
 
   def __hash__(self):
     value = 17
-    value = (value * 31) ^ hash(self.path)
     return value
 
   def __repr__(self):
@@ -487,14 +474,14 @@ class setLogDirectory_args:
   def __ne__(self, other):
     return not (self == other)
 
-class setLogDirectory_result:
+class getLogDirectory_result:
   """
   Attributes:
    - success
   """
 
   thrift_spec = (
-    (0, TType.BOOL, 'success', None, None, ), # 0
+    (0, TType.STRING, 'success', None, None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -510,8 +497,8 @@ class setLogDirectory_result:
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.BOOL:
-          self.success = iprot.readBool()
+        if ftype == TType.STRING:
+          self.success = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -523,10 +510,10 @@ class setLogDirectory_result:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('setLogDirectory_result')
+    oprot.writeStructBegin('getLogDirectory_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.BOOL, 0)
-      oprot.writeBool(self.success)
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -740,17 +727,14 @@ class getLogFile_result:
   """
   Attributes:
    - success
-   - err
   """
 
   thrift_spec = (
-    (0, TType.STRING, 'success', None, None, ), # 0
-    (1, TType.STRUCT, 'err', (FileNotFound, FileNotFound.thrift_spec), None, ), # 1
+    (0, TType.LIST, 'success', (TType.STRING,None), None, ), # 0
   )
 
-  def __init__(self, success=None, err=None,):
+  def __init__(self, success=None,):
     self.success = success
-    self.err = err
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -762,14 +746,13 @@ class getLogFile_result:
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.STRING:
-          self.success = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.STRUCT:
-          self.err = FileNotFound()
-          self.err.read(iprot)
+        if ftype == TType.LIST:
+          self.success = []
+          (_etype10, _size7) = iprot.readListBegin()
+          for _i11 in xrange(_size7):
+            _elem12 = iprot.readString()
+            self.success.append(_elem12)
+          iprot.readListEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -783,12 +766,11 @@ class getLogFile_result:
       return
     oprot.writeStructBegin('getLogFile_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.STRING, 0)
-      oprot.writeString(self.success)
-      oprot.writeFieldEnd()
-    if self.err is not None:
-      oprot.writeFieldBegin('err', TType.STRUCT, 1)
-      self.err.write(oprot)
+      oprot.writeFieldBegin('success', TType.LIST, 0)
+      oprot.writeListBegin(TType.STRING, len(self.success))
+      for iter13 in self.success:
+        oprot.writeString(iter13)
+      oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -800,7 +782,6 @@ class getLogFile_result:
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.success)
-    value = (value * 31) ^ hash(self.err)
     return value
 
   def __repr__(self):
@@ -1234,6 +1215,52 @@ class log_args:
     value = 17
     value = (value * 31) ^ hash(self.level)
     value = (value * 31) ^ hash(self.message)
+    return value
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class log_result:
+
+  thrift_spec = (
+  )
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('log_result')
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __hash__(self):
+    value = 17
     return value
 
   def __repr__(self):
